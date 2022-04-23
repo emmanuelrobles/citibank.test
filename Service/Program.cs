@@ -1,5 +1,5 @@
 using Service;
-using Service.Dtos;
+using Service.Settings;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>

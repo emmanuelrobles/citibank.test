@@ -2,10 +2,9 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using Application;
 using Application.Helpers;
-using Service.Dtos;
+using Service.Settings;
 
 namespace Service;
 

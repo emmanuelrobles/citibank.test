@@ -1,4 +1,4 @@
-namespace Service.Dtos;
+namespace Service.Settings;
 
 public class ServiceSettings
 {
