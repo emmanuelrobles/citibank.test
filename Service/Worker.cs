@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -26,7 +27,9 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
 
-        using (_validFilesQueue.Subscribe(tuple =>
+        using (_validFilesQueue
+                   .ObserveOn(new NewThreadScheduler())
+                   .Subscribe(tuple =>
                {
                    _logger.LogInformation("new valid file");
                    FileCreationHelper.CreateOutputFileWithRows(tuple.file,tuple.rows);
@@ -34,12 +37,14 @@ public class Worker : BackgroundService
                    FileMovementHelper.MoveValidProcessedFile(tuple.file);
                }))
 
-        using (_invalidFilesQueue.Do(tuple =>
+        using (_invalidFilesQueue
+                   .ObserveOn(new NewThreadScheduler())
+                   .Subscribe(tuple =>
                {
                    _logger.LogInformation("Bad queue {fileId}, errors: {@Errors}", tuple.file.FileId, tuple.errors);
                    FileCreationHelper.CreateErrorFileWithMessages(tuple.file, tuple.errors);
                    FileMovementHelper.MoveInvalidProcessedFile(tuple.file);
-               }).Subscribe())
+               }))
             
         while (!stoppingToken.IsCancellationRequested)
         {
